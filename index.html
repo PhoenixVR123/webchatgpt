@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>IP Logger</title>
+</head>
+<body>
+  <h1>Logging your IP...</h1>
+  <p>Your IP is being logged to the spreadsheet.</p>
+
+  <script>
+    // Step 1: Get the public IP from ipify
+    fetch("https://api.ipify.org?format=json")
+      .then(response => response.json())
+      .then(data => {
+        console.log("Got IP:", data.ip);
+
+        // Step 2: Send it to your Google Script using POST
+        fetch("https://script.google.com/macros/s/AKfycbw9PxQf81jM8N2qzkG4noC1jtZlN-rA-mBLjFkPCT0/dev", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: "ip=" + encodeURIComponent(data.ip)
+        })
+        .then(response => response.text())
+        .then(text => {
+          console.log("Script said:", text);
+        })
+        .catch(error => console.error("Error sending IP:", error));
+      })
+      .catch(error => console.error("Error fetching IP:", error));
+  </script>
+</body>
+</html>
