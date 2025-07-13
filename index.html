@@ -1,34 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>IP Logger</title>
+  <meta charset="UTF-8" />
+  <title>IP Logger Demo</title>
 </head>
 <body>
-  <h1>Logging your IP...</h1>
-  <p>Your IP is being logged to the spreadsheet.</p>
+  <h1>IP Logger Demo</h1>
+  <p>Open your backend terminal to see the logs.</p>
 
   <script>
-    // Step 1: Get the public IP from ipify
-    fetch("https://api.ipify.org?format=json")
-      .then(response => response.json())
+    // Step 1: Fetch public IP from a free API
+    fetch('https://api.ipify.org?format=json')
+      .then(res => res.json())
       .then(data => {
-        console.log("Got IP:", data.ip);
+        console.log('Got IP:', data.ip);
 
-        // Step 2: Send it to your Google Script using POST
-        fetch("https://script.google.com/macros/s/AKfycbw9PxQf81jM8N2qzkG4noC1jtZlN-rA-mBLjFkPCT0/dev", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-          },
-          body: "ip=" + encodeURIComponent(data.ip)
+        // Step 2: Send IP to your Python backend
+        fetch('http://localhost:5000/log-ip', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ip: data.ip })
         })
-        .then(response => response.text())
-        .then(text => {
-          console.log("Script said:", text);
-        })
-        .catch(error => console.error("Error sending IP:", error));
+        .then(response => response.json())
+        .then(json => console.log('Backend response:', json.message))
+        .catch(err => console.error('Error sending IP:', err));
       })
-      .catch(error => console.error("Error fetching IP:", error));
+      .catch(err => console.error('Error fetching IP:', err));
   </script>
 </body>
 </html>
